@@ -1,5 +1,7 @@
 package com.example.crowdfunding.services;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +32,10 @@ public class TokenService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    String pattern = "yyyy-MM-dd HH:mm";
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+    LocalDateTime now = LocalDateTime.now();
+    String formattedDateTime = now.format(formatter);
 
     // Invalider les anciens tokens
     public void invalidateOldTokens(Utilisateur user) {
@@ -59,6 +65,7 @@ public class TokenService {
         token.setIdToken(UUID.randomUUID().toString());
         token.setExpired(false);
         token.setRevoked(false);
+        token.setDateAjout(formattedDateTime);
         token.setUtilisateur(user);
         tokenRepository.save(token);
 
@@ -83,6 +90,7 @@ public class TokenService {
         token.setIdToken(UUID.randomUUID().toString());
         token.setExpired(false);
         token.setRevoked(false);
+        token.setDateModif(formattedDateTime);
         token.setUtilisateur(user);
         tokenRepository.save(token);
 

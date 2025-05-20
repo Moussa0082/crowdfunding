@@ -17,7 +17,10 @@ public class Token {
 
     private String dateAjout; // le refreshToken
 
+    private String dateModif; 
+
     private boolean expired;
+
     private boolean revoked;
 
     @ManyToOne
