@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.crowdfunding.exception.AlreadyExistsException;
+import com.example.crowdfunding.exception.InvalidAttributeException;
 import com.example.crowdfunding.exception.NoContentException;
 
 import io.swagger.v3.oas.annotations.Hidden;
@@ -15,12 +16,17 @@ import io.swagger.v3.oas.annotations.Hidden;
 public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<String> handleAlreadyExists(AlreadyExistsException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT); // 409 Conflict
+        return new ResponseEntity<>("erreur : " + ex.getMessage(), HttpStatus.CONFLICT); // 409 Conflict
     }
 
     @ExceptionHandler(NoContentException.class)
     public ResponseEntity<String> handleNoContentException(NoContentException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // 404 Not found 
+        return new ResponseEntity<>("erreur : " + ex.getMessage(), HttpStatus.NOT_FOUND); // 404 Not found 
+    }
+
+    @ExceptionHandler(InvalidAttributeException.class)
+    public ResponseEntity<String> handleInvalidAttributeException(InvalidAttributeException ex) {
+        return new ResponseEntity<>("erreur : " + ex.getMessage(), HttpStatus.BAD_REQUEST); // 400 Bad request 
     }
 
 }

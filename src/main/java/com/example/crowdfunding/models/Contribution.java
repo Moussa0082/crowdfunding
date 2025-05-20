@@ -1,5 +1,6 @@
 package com.example.crowdfunding.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -18,7 +19,14 @@ public class Contribution {
 
     private String pieceJustificative;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     private String dateContribution ;
+
+    private String dateModif ;
+
+
 
     // Relations
     @ManyToOne

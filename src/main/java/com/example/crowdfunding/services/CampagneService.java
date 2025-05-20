@@ -60,7 +60,7 @@ public class CampagneService {
 
      public Campagne modifierCampagne(Campagne campagne, String idCampagne,  MultipartFile photo) throws IOException{
  
-        Campagne c = campagneRepository.findByTitreAndCreateur(campagne.getTitre(), campagne.getCreateur());
+        Campagne c = campagneRepository.findById(idCampagne).orElseThrow(() -> new NoContentException("Campagne non trouvé") );
 
         if(c == null)
         throw new NoContentException("Cette campagne n'existe pas");
@@ -115,7 +115,7 @@ public class CampagneService {
 
 
      public Campagne findCampagneByIdCampagne(String idCampagne){
-        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(() -> new NoContentException("Campagne non trouvé") );
+        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(() -> new NoContentException("Campagne non trouvé"));
 
         if(campagne == null)
             throw new NoContentException("Campagne non trouver");
@@ -123,7 +123,7 @@ public class CampagneService {
     }
 
     public String deleteCampagne(String idCampagne){
-        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(() -> new IllegalStateException("Campagne non trouvé") );
+        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(() -> new NoContentException("Campagne non trouvé") );
 
         if(campagne == null)
             throw new NoContentException("Campagne non trouver");
@@ -132,7 +132,7 @@ public class CampagneService {
     }
 
     public Campagne active(String idCampagne) throws Exception{
-        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(null);
+        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(() -> new NoContentException("Campagne non trouvé"));
 
         try {
             campagne.setActive(true);
@@ -143,7 +143,7 @@ public class CampagneService {
     }
 
     public Campagne desactive(String idCampagne) throws Exception{
-        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(null);
+        Campagne campagne = campagneRepository.findById(idCampagne).orElseThrow(() -> new NoContentException("Campagne non trouvé"));
 
         try {
             campagne.setActive(false);
