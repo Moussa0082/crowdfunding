@@ -10,12 +10,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.crowdfunding.dto.AuthResponse;
+import com.example.crowdfunding.exception.NoContentException;
 import com.example.crowdfunding.models.Utilisateur;
+import com.example.crowdfunding.repository.UtilisateurRepository;
+import com.example.crowdfunding.security.JwtUtil;
 import com.example.crowdfunding.services.UtilisateurService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -29,6 +34,12 @@ public class UtilisateurController {
 
     @Autowired
     UtilisateurService utilisateurService;
+
+    @Autowired
+    UtilisateurRepository utilisateurRepository;
+
+    @Autowired
+    JwtUtil  jwtUtil;
 
      @PostMapping("/create")
     @Operation(summary = "Création d'un utilisateur")
@@ -69,10 +80,32 @@ public class UtilisateurController {
         }
     }
 
+
+    @PostMapping("/token/refresh/{refreshToken}")
+    public ResponseEntity<AuthResponse> refreshToken(@PathVariable String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String email = jwtUtil.extractEmail(refreshToken);
+        Utilisateur user = utilisateurRepository.findByEmail(email)
+            .orElseThrow(() -> new NoContentException("Utilisateur non trouvé"));
+
+        // Génère un nouvel access token
+        String newAccessToken = jwtUtil.generateAccessToken(user);
+
+        return ResponseEntity.ok(new AuthResponse(newAccessToken, refreshToken));
+    }
+
      @GetMapping("/getAllUser")
     @Operation(summary="Liste de tous les utilisateurs")
     public ResponseEntity<List<Utilisateur>> getAll(){
         return new ResponseEntity<>(utilisateurService.getAllUser(), HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Utilisateur user) {
+        return utilisateurService.login(user);
     }
 
      @GetMapping("/getUtilisateurByIdUtilisateur/{idUtilisateur}")

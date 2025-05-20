@@ -5,14 +5,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.management.relation.Role;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.crowdfunding.dto.AuthResponse;
 import com.example.crowdfunding.exception.AlreadyExistsException;
 import com.example.crowdfunding.exception.NoContentException;
 
@@ -34,6 +37,10 @@ public class UtilisateurService {
 
     @Autowired
     ImageService imageService;
+
+
+    @Autowired
+    TokenService tokenService;
 
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
@@ -67,15 +74,32 @@ public class UtilisateurService {
     }
 
 
+     public ResponseEntity<?> login(Utilisateur u) {
+        Optional<Utilisateur> userOptional = utilisateurRepository.findByEmail(u.getEmail());
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(401).body("Utilisateur introuvable");
+        }
+
+        Utilisateur user = userOptional.get();
+
+        if (!passwordEncoder.matches(u.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(401).body("Mot de passe incorrect");
+        }
+
+        AuthResponse tokens = tokenService.generateTokens(user.getEmail());
+        return ResponseEntity.ok(tokens);
+    }
+
+
      public Utilisateur modifierUtilisateur(Utilisateur utilisateur ,String idUtilisateur, MultipartFile photo) throws IOException{
  
-        Utilisateur u = utilisateurRepository.findById(idUtilisateur).orElseThrow(() -> new IllegalStateException("Utilisateur non trouvé") );
+        Utilisateur u = utilisateurRepository.findById(idUtilisateur).orElseThrow(() -> new NoContentException("Utilisateur non trouvé") );
 
         String passWordHasher = passwordEncoder.encode(utilisateur.getPassword());
         if(utilisateur.getPassword() != null){
             u.setPassword(passWordHasher);
         }
-
 
         if(u == null)
         throw new NoContentException("Cet utilisateur n'existe pas");
@@ -109,10 +133,10 @@ public class UtilisateurService {
     }
 
     public String deleteUser(String idUtilisateur){
-        Utilisateur user = utilisateurRepository.findById(idUtilisateur).orElseThrow(() -> new IllegalStateException("Utilisateur non trouvé") );
+        Utilisateur user = utilisateurRepository.findById(idUtilisateur).orElseThrow(() -> new NoContentException("Utilisateur non trouvé") );
 
         if(user == null)
-            throw new IllegalStateException("Utilisateur non trouver");
+            throw new NoContentException("Utilisateur non trouver");
             utilisateurRepository.delete(user);
         return "Utilisateur supprimé avec succèss";
     }

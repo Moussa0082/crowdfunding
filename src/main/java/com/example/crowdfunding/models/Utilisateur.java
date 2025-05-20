@@ -36,6 +36,9 @@ public class Utilisateur {
     @Column(unique = true, nullable = true)
     private String email;
 
+
+    private String refreshToken;
+
     @Column(nullable = false)
     private String password;
 
