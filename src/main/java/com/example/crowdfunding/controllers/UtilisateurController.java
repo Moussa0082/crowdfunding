@@ -124,7 +124,7 @@ public class UtilisateurController {
 
 
     @PutMapping("/desactiver/{idUtilisateur}")
-    @Operation(summary="Desactivation un user")
+    @Operation(summary="Desactivation d'un user")
     public ResponseEntity<Utilisateur> desactiveUser(@PathVariable String idUtilisateur) throws Exception {
         return new ResponseEntity<>(utilisateurService.desactive(idUtilisateur), HttpStatus.OK);
     }

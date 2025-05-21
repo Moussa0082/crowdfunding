@@ -87,6 +87,15 @@ public class ContributionController {
         return new ResponseEntity<>(contributionService.getContributionSummaryByCampagne(idCampagne), HttpStatus.OK);
     }
 
+
+    @GetMapping("/getContributionByIdContribution/{idContribution}")
+    @Operation(summary="Liste de tout les contributeurs par campagne")
+    public ResponseEntity<Contribution> getContributionByIdContribution(
+        @PathVariable String idContribution
+    ){
+        return new ResponseEntity<>(contributionService.findContributionByIdContribution(idContribution), HttpStatus.OK);
+    }
+
     @DeleteMapping("/delete/{id}")
     @Operation(summary="Supprimé une contribution")
     public ResponseEntity<Void> deleteContribution(@PathVariable("id") String id) {

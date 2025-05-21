@@ -20,7 +20,7 @@ import com.example.crowdfunding.services.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
-@RequestMapping("/contact")
+@RequestMapping("/api-crowdfunding/contact")
 public class ContactController {
 
     @Autowired
