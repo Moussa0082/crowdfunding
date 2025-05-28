@@ -1,7 +1,13 @@
 package com.example.crowdfunding.models;
 
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -25,13 +31,19 @@ public class Campagne {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private int montantCible;
+    private BigInteger montantCible;
 
-    private int montantActuel ;
+    private BigInteger montantActuel ;
 
-    private int pourcentage;
+    private double pourcentage;
 
+    // @JsonFormat(pattern = "yyyy-MM-dd")
     private String dateLimite;
+
+
+    private String jourRestant;
+
+    private String lieu;
 
     private String dateModif;
 
@@ -41,7 +53,10 @@ public class Campagne {
 
     private boolean isActive = true;
 
-    private String dateCreation ;
+    @Column(name = "date_creation")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime dateCreation;
 
     // Relations
     @ManyToOne

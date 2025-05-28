@@ -78,6 +78,31 @@ public class CampagneController {
         return new ResponseEntity<>(campagneService.getAllCampagne(), HttpStatus.OK);
     }
 
+     @GetMapping("/getNombreCampagneEnCours")
+    @Operation(summary="Nombre de campagnes en cours")
+    public ResponseEntity<?> getNombreCampagneEnCours(){
+        return new ResponseEntity<>(campagneService.getNombreTotalCampagneEnCours(), HttpStatus.OK);
+    }
+
+     @GetMapping("/getNombreCampagneValider")
+    @Operation(summary="Nombre de campagnes valider")
+    public ResponseEntity<?> getNombreCampagneValider(){
+        return new ResponseEntity<>(campagneService.getNombreTotalCampagneValider(), HttpStatus.OK);
+    }
+
+
+     @GetMapping("/getMontantTotalMobiliserCampagne")
+    @Operation(summary="Recuperer la somme total mobiliser des campagnes")
+    public ResponseEntity<?> getMontantTotalMobiliserCampagne(){
+        return new ResponseEntity<>(campagneService.getMontantTotalMobiliserCampagne(), HttpStatus.OK);
+    }
+
+     @GetMapping("/getMontantTotalCiblerCampagne")
+    @Operation(summary="Recuperer la somme total cibler des campagnes ")
+    public ResponseEntity<?> getMontantTotalCibleCampagne(){
+        return new ResponseEntity<>(campagneService.getMontantTotalCibleCampagne(), HttpStatus.OK);
+    }
+
      @GetMapping("/getAllCampagnesByUtilisateur/{idUtilisateur}")
     @Operation(summary="Liste de tous les campagnes par utilisateur")
     public ResponseEntity<List<Campagne>> getAllCampagnesByUser(

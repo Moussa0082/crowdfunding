@@ -87,6 +87,12 @@ public class ContributionController {
         return new ResponseEntity<>(contributionService.getContributionSummaryByCampagne(idCampagne), HttpStatus.OK);
     }
 
+    @GetMapping("/getNombreContribution")
+    @Operation(summary="Nombre de contribution pour tous les campagnes")
+    public ResponseEntity<?> getNombreContribution(){
+        return new ResponseEntity<>(contributionService.getNombreContribution(), HttpStatus.OK);
+    }
+
 
     @GetMapping("/getContributionByIdContribution/{idContribution}")
     @Operation(summary="Liste de tout les contributeurs par campagne")

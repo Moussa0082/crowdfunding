@@ -13,9 +13,12 @@ import javax.management.relation.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.crowdfunding.dto.AuthResponse;
+import com.example.crowdfunding.dto.LoginResponse;
+import com.example.crowdfunding.dto.UtilisateurDTO;
 import com.example.crowdfunding.exception.AlreadyExistsException;
 import com.example.crowdfunding.exception.NoContentException;
 
@@ -74,30 +77,58 @@ public class UtilisateurService {
     }
 
 
-     public ResponseEntity<?> login(Utilisateur u) {
-        Optional<Utilisateur> userOptional = utilisateurRepository.findByEmail(u.getEmail());
+    //  public ResponseEntity<?> login(String email, String password ) {
+    //     Optional<Utilisateur> userOptional = utilisateurRepository.findByEmail(email);
 
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(401).body("Utilisateur introuvable");
-        }
+    //     if (userOptional.isEmpty()) {
+    //         return ResponseEntity.status(401).body("Utilisateur introuvable");
+    //     }
 
-        Utilisateur user = userOptional.get();
+    //     Utilisateur user = userOptional.get();
 
-        if (!passwordEncoder.matches(u.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(401).body("Mot de passe incorrect");
-        }
+    //     if(!user.isActif())
+    //     throw new NoContentException("Votre compte est desactivé veuiller contacter l'assistance");
 
-        AuthResponse tokens = tokenService.generateTokens(user.getEmail());
-        return ResponseEntity.ok(tokens);
+    //     if (!passwordEncoder.matches(password, user.getPassword())) {
+    //         return ResponseEntity.status(401).body("Mot de passe incorrect");
+    //     }
+
+    //     AuthResponse tokens = tokenService.generateTokens(user.getEmail());
+    //     return ResponseEntity.ok(tokens);
+    // }
+    public ResponseEntity<?> login(String email, String password ) {
+    Optional<Utilisateur> userOptional = utilisateurRepository.findByEmail(email);
+
+    if (userOptional.isEmpty()) {
+        return ResponseEntity.status(401).body("Utilisateur introuvable");
     }
+
+    Utilisateur user = userOptional.get();
+
+    if (!user.isActif()) {
+        throw new NoContentException("Votre compte est désactivé, veuillez contacter l’assistance");
+    }
+
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+        return ResponseEntity.status(401).body("Mot de passe incorrect");
+    }
+
+    AuthResponse tokens = tokenService.generateTokens(user.getEmail());
+    UtilisateurDTO userDTO = new UtilisateurDTO(user);
+
+    LoginResponse response = new LoginResponse(tokens.getAccessToken(), tokens.getRefreshToken(), userDTO);
+
+    return ResponseEntity.ok(response);
+}
+
 
 
      public Utilisateur modifierUtilisateur(Utilisateur utilisateur ,String idUtilisateur, MultipartFile photo) throws IOException{
  
         Utilisateur u = utilisateurRepository.findById(idUtilisateur).orElseThrow(() -> new NoContentException("Utilisateur non trouvé") );
 
-        String passWordHasher = passwordEncoder.encode(utilisateur.getPassword());
-        if(utilisateur.getPassword() != null){
+        if (StringUtils.hasText(utilisateur.getPassword())) {
+            String passWordHasher = passwordEncoder.encode(utilisateur.getPassword());
             u.setPassword(passWordHasher);
         }
 
@@ -106,6 +137,7 @@ public class UtilisateurService {
 
         u.setPrenom(utilisateur.getPrenom());
         u.setNom(utilisateur.getNom());
+        u.setNonStructure(utilisateur.getNonStructure());
         u.setNumero(utilisateur.getNumero());
         u.setAddresse(utilisateur.getAddresse());
         u.setEmail(utilisateur.getEmail());

@@ -1,5 +1,7 @@
 package com.example.crowdfunding.models;
 
+import java.math.BigInteger;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,7 +17,7 @@ public class Contribution {
     @Id
     private String idContribution;
 
-    private int montant;
+    private BigInteger montant;
 
     private String pieceJustificative;
 
@@ -25,7 +27,6 @@ public class Contribution {
     private String dateContribution ;
 
     private String dateModif ;
-
 
 
     // Relations

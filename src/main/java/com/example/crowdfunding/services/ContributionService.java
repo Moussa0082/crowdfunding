@@ -1,6 +1,7 @@
 package com.example.crowdfunding.services;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -65,10 +66,15 @@ public class ContributionService {
         contribution.setCampagne(campagne);
     
         // Mettre à jour le montant actuel et le pourcentage de la campagne
-        int nouveauMontant = campagne.getMontantActuel() + contribution.getMontant();
+        BigInteger nouveauMontant = campagne.getMontantActuel().add(contribution.getMontant());
         campagne.setMontantActuel(nouveauMontant);
     
-        int pourcentage = (int) ((nouveauMontant * 100.0) / campagne.getMontantCible());
+        BigInteger cent = BigInteger.valueOf(100);
+        BigInteger produit = nouveauMontant.multiply(cent);
+        BigInteger montantCible = campagne.getMontantCible();
+        
+        // Diviser en double pour avoir un pourcentage réel (si tu veux un pourcentage entier arrondi)
+        double pourcentage = produit.doubleValue() / montantCible.doubleValue();
         campagne.setPourcentage(pourcentage);
     
         // Sauvegarder d’abord la campagne mise à jour
@@ -94,23 +100,31 @@ public class ContributionService {
             c.setPieceJustificative(imageBase64); 
         }
     
-        if (contribution.getMontant() <= 0) {
+        if (contribution.getMontant().compareTo(BigInteger.ZERO) <= 0) {
             throw new InvalidAttributeException("Le montant de la contribution doit être supérieur à 0");
         }
+        
     
         // Recalculer le montant de la campagne
-        int ancienMontant = c.getMontant();
-        int nouveauMontant = contribution.getMontant();
+        BigInteger ancienMontant = c.getMontant();
+        BigInteger nouveauMontant = contribution.getMontant();
     
         c.setMontant(nouveauMontant);
         c.setDescription(contribution.getDescription());
         c.setDateModif(formattedDateTime); // Assure-toi que cette variable est bien une String formatée
     
         // Mettre à jour la campagne
-        int montantActuelCorrige = campagne.getMontantActuel() - ancienMontant + nouveauMontant;
+        BigInteger montantActuelCorrige = campagne.getMontantActuel().subtract(ancienMontant).add(nouveauMontant) ;
         campagne.setMontantActuel(montantActuelCorrige);
     
-        int pourcentage = (int) ((montantActuelCorrige * 100.0) / campagne.getMontantCible());
+        BigInteger cent = BigInteger.valueOf(100);
+        BigInteger produit = montantActuelCorrige.multiply(cent);
+        BigInteger montantCible = campagne.getMontantCible();
+        
+        // Diviser en double pour avoir un pourcentage réel (si tu veux un pourcentage entier arrondi)
+        double pourcentage = produit.doubleValue() / montantCible.doubleValue();
+
+        // int pourcentage = (int) ((montantActuelCorrige * 100.0) / campagne.getMontantCible());
         campagne.setPourcentage(pourcentage);
     
         campagneRepository.save(campagne);
@@ -194,7 +208,7 @@ public class ContributionService {
                 if (summary == null) {
                     return new ContributionSummaryDto(user, contribution.getMontant(), dateContribution);
                 } else {
-                    summary.setMontantTotal(summary.getMontantTotal() + contribution.getMontant());
+                    summary.setMontantTotal(summary.getMontantTotal().add(contribution.getMontant()));
                     if (dateContribution.isAfter(summary.getDerniereDate())) {
                         summary.setDerniereDate(dateContribution);
                     }
@@ -209,6 +223,10 @@ public class ContributionService {
     }
     
     
+    public int getNombreContribution(){
+        List<Contribution> contributionListes = contributionRepository.findAll();
+        return contributionListes.size();
+    }
 
      public Contribution findContributionByIdContribution(String idContribution){
         Contribution contribution = contributionRepository.findById(idContribution).orElseThrow(() -> new NoContentException("Contribution non trouvée") );

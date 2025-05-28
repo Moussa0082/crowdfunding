@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.crowdfunding.exception.AlreadyExistsException;
 import com.example.crowdfunding.exception.NoContentException;
 import com.example.crowdfunding.models.Categorie;
+import com.example.crowdfunding.models.Utilisateur;
 import com.example.crowdfunding.repository.CategorieRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -56,7 +57,7 @@ public class CategorieService {
 
      public Categorie modifierCategorie(Categorie categorie, String idCategorie,  MultipartFile photo) throws IOException{
  
-        Categorie c = categorieRepository.findByNomCategorie(categorie.getNomCategorie());
+        Categorie c = categorieRepository.findById(idCategorie).orElseThrow(() -> new NoContentException("Categorie non trouvé") );
 
         if(c == null)
         throw new NoContentException("Cette categorie n'existe pas");
@@ -69,7 +70,7 @@ public class CategorieService {
         c.setNomCategorie(categorie.getNomCategorie());           
         c.setDescription(categorie.getDescription());           
         c.setDateModif(formattedDateTime);        
-        Categorie savedCategorie = categorieRepository.save(categorie);
+        Categorie savedCategorie = categorieRepository.save(c);
         return savedCategorie;
     }
 
@@ -80,7 +81,7 @@ public class CategorieService {
         if (categories.isEmpty())
             throw new EntityNotFoundException("Aucune categorie trouvée");
 
-        categories.sort(Comparator.comparing(Categorie::getDateCreation).reversed());
+            categories.sort(Comparator.comparing(Categorie::getDateCreation, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
         
         return categories;
     }

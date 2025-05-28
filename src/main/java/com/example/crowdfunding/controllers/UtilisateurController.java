@@ -103,9 +103,9 @@ public class UtilisateurController {
         return new ResponseEntity<>(utilisateurService.getAllUser(), HttpStatus.OK);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Utilisateur user) {
-        return utilisateurService.login(user);
+    @GetMapping("/login")
+    public ResponseEntity<?> login(@RequestParam("email") String email, @RequestParam("password") String password) {
+        return utilisateurService.login(email,password);
     }
 
      @GetMapping("/getUtilisateurByIdUtilisateur/{idUtilisateur}")

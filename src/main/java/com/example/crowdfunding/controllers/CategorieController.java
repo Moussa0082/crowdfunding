@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.crowdfunding.models.Categorie;
 import com.example.crowdfunding.services.CategorieService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,24 +53,79 @@ public class CategorieController {
 
     @PutMapping("/update/{idCategorie}")
     @Operation(summary = "Mise à jour d'une categorie par son Id ")
-    public ResponseEntity<Categorie> updateCampagne(
-            @PathVariable String idCategorie,
-            @Valid @RequestParam("campagne") String categorieString,
-            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-        Categorie categorie = new Categorie();
-        try {
-            categorie = new JsonMapper().readValue(categorieString, Categorie.class);
-        } catch (JsonProcessingException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+//     public ResponseEntity<?> updateCategorie(
+//         @PathVariable String idCategorie,
+//         @Valid @RequestParam("categorie") String categorieString,
+//         @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
-        try {
-            Categorie categorieMisAjour = categorieService.modifierCategorie(categorie, idCategorie,imageFile);
-            return new ResponseEntity<>(categorieMisAjour, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//     try {
+//         // Convertit la chaîne JSON en objet Java
+//         Categorie categorie = new ObjectMapper().readValue(categorieString, Categorie.class);
+
+//         // Appelle le service pour la mise à jour
+//         Categorie categorieMisAjour = categorieService.modifierCategorie(categorie, idCategorie, imageFile);
+
+//         return ResponseEntity.ok(categorieMisAjour);
+
+//     } catch (JsonProcessingException e) {
+//         return ResponseEntity
+//                 .badRequest()
+//                 .body("Erreur de format JSON pour 'categorie' : " + e.getOriginalMessage());
+
+//     } catch (Exception e) {
+//         return ResponseEntity
+//                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                 .body("Erreur serveur lors de la mise à jour de la catégorie : " + e.getMessage());
+//     }
+// }
+public ResponseEntity<?> updateCategorie(
+    @PathVariable String idCategorie,
+    @Valid @RequestParam("categorie") String categorieString, // Expecting a JSON string here
+    @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+
+Categorie categorie = new Categorie();
+try {
+    // Attempt to deserialize the JSON string into a Categorie object
+    categorie = new JsonMapper().readValue(categorieString, Categorie.class);
+} catch (JsonProcessingException e) {
+    // If the string is not valid JSON, return a Bad Request error
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body("Le format des données de la catégorie est invalide. Veuillez fournir un JSON valide.");
+}
+
+try {
+    // Call your service to modify the category
+    Categorie categorieMisAjour = categorieService.modifierCategorie(categorie, idCategorie, imageFile);
+    return new ResponseEntity<>(categorieMisAjour, HttpStatus.OK);
+} catch (Exception e) {
+    // Catch broader exceptions from the service layer for server errors
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body("Erreur serveur lors de la mise à jour de la catégorie : " + e.getMessage());
+}
+}
+
+    // public ResponseEntity<?> updateCategorie(
+    //         @PathVariable String idCategorie,
+    //         @Valid @RequestParam("categorie") String categorieString,
+    //         @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+    //     Categorie categorie = new Categorie();
+    //     try {
+    //         categorie = new JsonMapper().readValue(categorieString, Categorie.class);
+    //     } catch (JsonProcessingException e) {
+    //         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    //     }
+
+    //     try {
+    //         Categorie categorieMisAjour = categorieService.modifierCategorie(categorie, idCategorie,imageFile);
+    //         return new ResponseEntity<>(categorieMisAjour, HttpStatus.OK);
+    //     } catch (Exception e) {
+    //         return  ResponseEntity
+    //             .status(HttpStatus.INTERNAL_SERVER_ERROR)
+    //             .body("Erreur serveur lors de la mise à jour de la catégorie : " + e.getMessage());
+    //     }
+    // }
 
     @GetMapping("/getAllCategorie")
     @Operation(summary="Liste de tout les categories")
